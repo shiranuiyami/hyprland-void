@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+
+# We need to sign the packages with our private key so that they will be accepted by xbps remotely
+# See: https://docs.voidlinux.org/xbps/repositories/signing.html
+
+# Extract domain from GITEA_SERVER_URL or use github.com as fallback
+GIT_SERVER=$(echo ${GITEA_SERVER_URL:-https://github.com} | sed 's|https://||' | sed 's|http://||')
+
+COMMAND="
+  # Retrieve the signing key from the separate private repository
+  cd /work
+
+  if [ -n \"\$GITEA_SERVER_URL\" ]; then
+    # Gitea API
+    curl \
+      -H \"Authorization: token \$PEM_PAT\" \
+      -o private.pem \
+      -L \${GITEA_SERVER_URL}/api/v1/repos/\$REPO_ORG/void-private-pem/raw/private.pem
+  else
+    # GitHub API
+    curl \
+      -H \"Authorization: token \$PEM_PAT\" \
+      -H \"Accept: application/vnd.github.v3.raw\" \
+      -O -L https://api.github.com/repos/\$REPO_OWNER/hyprland-void-private-pem/contents/private.pem
+  fi
+
+  # Sign packages
+  xbps-rindex --privkey /work/private.pem --sign --signedby \"ShiranuiYami\" /work/packages
+  xbps-rindex --privkey /work/private.pem --sign-pkg /work/packages/*.xbps
+"
+
+echo "Running command: $COMMAND"
+sh -c "$COMMAND"
+

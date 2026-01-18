@@ -1,0 +1,48 @@
+# Template file for 'hyprpaper'
+pkgname=hyprpaper
+version=0.8.0
+revision=2
+build_style=cmake
+configure_args+=" --no-warn-unused-cli"
+configure_args+=" -DCMAKE_BUILD_TYPE:STRING=Release"
+configure_args+=" -DCMAKE_INSTALL_PREFIX:PATH=/usr"
+hostmakedepends="
+  pkgconf
+  wayland-devel
+  hyprutils
+  hyprwayland-scanner
+"
+makedepends="
+  cairo-devel
+  file-devel
+  libjpeg-turbo-devel
+  libwebp-devel
+  hyprgraphics
+  hyprland-protocols
+  hyprlang
+  hyprtoolkit
+  hyprwayland-scanner
+  hyprwire
+  pango-devel
+  wayland-devel
+  wayland-protocols
+  wlroots-devel
+"
+short_desc="Fast wallpaper utility for wlroots compositors with IPC controls"
+maintainer="ShiranuiYami <shiranuiyami@voidsmiths.dev>"
+license="BSD-3-Clause"
+homepage="https://github.com/hyprwm/hyprpaper"
+distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
+checksum="bc10f9c42e2dead8d7e0001f0194ba4ede12bb50bd5e5d766914be79e99386d0"
+
+post_patch() {
+  # Fix C++23 append_range not available in libstdc++ 14
+  # WallpaperMatcher.cpp - line 19
+  sed -i '19s|m_settings\.append_range(std::move(s));|m_settings.insert(m_settings.end(), std::make_move_iterator(s.begin()), std::make_move_iterator(s.end()));|' \
+    src/config/WallpaperMatcher.cpp
+}
+
+post_install() {
+  vlicense LICENSE
+}
+

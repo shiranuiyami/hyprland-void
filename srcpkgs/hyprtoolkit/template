@@ -1,0 +1,40 @@
+# Template file for 'hyprtoolkit'
+pkgname=hyprtoolkit
+version=0.5.0
+revision=2
+build_style=cmake
+configure_args+=" --no-warn-unused-cli"
+configure_args+=" -DCMAKE_BUILD_TYPE:STRING=Release"
+configure_args+=" -DCMAKE_INSTALL_PREFIX:PATH=/usr"
+hostmakedepends="
+  cmake
+  hyprwayland-scanner
+  pkgconf
+"
+makedepends="
+  aquamarine
+  cairo-devel
+  hyprgraphics
+  hyprlang
+  hyprutils
+  hyprwayland-scanner
+  iniparser-devel
+  libdrm-devel
+  libxkbcommon-devel
+  MesaLib-devel
+  pango-devel
+  pixman-devel
+  wayland-devel
+  wayland-protocols
+"
+short_desc="Hyprland's toolkit for building Wayland GUIs"
+maintainer="ShiranuiYami <shiranuiyami@voidsmiths.dev>"
+license="BSD-3-Clause"
+homepage="https://github.com/hyprwm/hyprtoolkit"
+changelog="https://github.com/hyprwm/hyprtoolkit/releases"
+distfiles="https://github.com/hyprwm/hyprtoolkit/archive/refs/tags/v${version}.tar.gz"
+checksum=a55c893dfd5c629c918e1c0b06bdc444f2f832667e9f7b89b061f8c40a06823f
+
+post_install() {
+  vlicense LICENSE
+}
